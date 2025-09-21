@@ -140,7 +140,7 @@ export const App = () => {
 				<button ref={submitButtonRef}
 				className={styles.submitButton}
 				type="submit"
-				disabled={!isFormValid()}>Зарегестрироваться</button>
+				disabled={!isFormValid()}>Зарегистрироваться</button>
 			</form>
 		</div>
 	);
