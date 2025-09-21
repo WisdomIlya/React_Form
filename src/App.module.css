@@ -13,30 +13,10 @@ code {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
-.formTitle {
-  text-align: center;
-  color: #1a1a1a;
-  margin-bottom: 2rem;
-  font-size: 1.8rem;
-  font-weight: 600;
-}
-
-.form {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
 .formGroup {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;
-}
-
-.formLabel {
-  font-weight: 500;
-  color: #374151;
-  font-size: 0.9rem;
 }
 
 .formInput {
@@ -53,16 +33,6 @@ code {
   border-color: #3b82f6;
   background: white;
   box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.formInput.error {
-  border-color: #ef4444;
-  background: #fef2f2;
-}
-
-.formInput.success {
-  border-color: #10b981;
-  background: #f0fdf4;
 }
 
 .formError {
@@ -114,13 +84,6 @@ code {
   width: 100%;
 }
 
-.strengthText {
-  font-size: 13px;
-  font-weight: 600;
-  display: block;
-  text-align: center;
-}
-
 .submitButton {
   padding: 0.75rem 1.5rem;
   background: linear-gradient(135deg, #3b82f6, #2563eb);
@@ -150,25 +113,6 @@ code {
   transform: none;
 }
 
-.formFooter {
-  text-align: center;
-  margin-top: 1.5rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #e5e7eb;
-  color: #6b7280;
-  font-size: 0.9rem;
-}
-
-.formLink {
-  color: #3b82f6;
-  text-decoration: none;
-  font-weight: 500;
-}
-
-.formLink:hover {
-  text-decoration: underline;
-}
-
 /* Анимации */
 @keyframes shake {
   0%, 100% { transform: translateX(0); }
@@ -195,27 +139,6 @@ code {
   animation: fadeIn 0.3s ease-out;
 }
 
-/* Иконки внутри полей */
-.inputWrapper {
-  position: relative;
-}
-
-.passwordToggle {
-  position: absolute;
-  right: 1rem;
-  top: 50%;
-  transform: translateY(-50%);
-  background: none;
-  border: none;
-  color: #6b7280;
-  cursor: pointer;
-  padding: 0.25rem;
-}
-
-.passwordToggle:hover {
-  color: #374151;
-}
-
 /* Адаптивность */
 @media (max-width: 480px) {
   .formContainer {
@@ -223,34 +146,7 @@ code {
     padding: 1.5rem;
   }
 
-  .formTitle {
-    font-size: 1.5rem;
-  }
-
   .formInput {
     padding: 0.65rem 0.9rem;
-  }
-}
-
-/* Темная тема */
-@media (prefers-color-scheme: dark) {
-  .formContainer {
-    background: #1f2937;
-    color: white;
-  }
-
-  .formLabel {
-    color: #e5e7eb;
-  }
-
-  .formInput {
-    background: #374151;
-    border-color: #4b5563;
-    color: white;
-  }
-
-  .formInput:focus {
-    background: #1f2937;
-    border-color: #3b82f6;
   }
 }

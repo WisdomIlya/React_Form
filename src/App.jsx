@@ -1,18 +1,21 @@
 import { useState, useRef, useEffect } from 'react';
 import styles from './App.module.css';
-import { USER_FORM } from './constants';
-
-const sendFormData = (formData, target) => {
-	console.log(formData);
-	console.log(target.value);
-};
+import { PASSWORD_STRENGTH, USER_FORM } from './constants';
+import { sendFormData } from './api';
+import { validateEmailOnBlur,
+	validatePasswordOnBlur,
+	validatePasswordRepeatOnBlur } from './utils/blur/blur';
+import { validatePassword,
+	validateRepeatPassword,
+	calculatePasswordStrength } from './utils/validate/validate.js';
 
 export const App = () => {
 	const [formData, setFormData] = useState( USER_FORM );
 	const [errorEmail, setEmailError] = useState(null);
 	const [errorPassword, setErrorPassword] = useState(null);
 	const [errorRepeatPassword, setErrorRepeatPassword] = useState(null);
-	const [passwordStrength, setPasswordStrength] = useState({ width: 0, text: '', class: '' })
+	const [passwordStrength, setPasswordStrength] = useState( PASSWORD_STRENGTH );
+	const [lastChangedField, setLastChangedField] = useState ('');
 
 	const submitButtonRef = useRef(null);
 
@@ -29,94 +32,67 @@ export const App = () => {
 	}
 
   	useEffect(() => {
-	const isValid = formData.email &&
-    formData.password &&
-    formData.repeatPassword &&
-    !errorEmail &&
-    !errorPassword &&
-    !errorRepeatPassword &&
-    formData.password === formData.repeatPassword;
+  	const allFieldsFilled = formData.email && formData.password && formData.repeatPassword;
+  	const noErrors = !errorEmail && !errorPassword && !errorRepeatPassword;
+  	const passwordsMatch = formData.password === formData.repeatPassword;
 
-    if (isValid && submitButtonRef.current) {
-      const timer = setTimeout(() => {
-        submitButtonRef.current.focus();
-      }, 100);
+  	if (allFieldsFilled && noErrors && passwordsMatch &&
+      lastChangedField === 'repeatPassword' &&
+      submitButtonRef.current) {
+    const timer = setTimeout(() => {
+      submitButtonRef.current.focus();
+    }, 100);
 
-      return () => clearTimeout(timer);
-    }
-  	}, [formData, errorEmail, errorPassword, errorRepeatPassword]);
+    return () => clearTimeout(timer);
+  	}
+	}, [formData, errorEmail, errorPassword, errorRepeatPassword, lastChangedField]);
 
 	const onEmailChange = ({ target }) => {
-		setFormData({...formData, email:target.value});
+		const newValue = target.value;
+		setFormData({...formData, email:newValue});
+		setLastChangedField('email');
 
 		let newEmailError = null;
-
-		if (target.value.length > 20) newEmailError = 'Email слишком длинный';
-  		else if (target.value.indexOf('..') !== -1) newEmailError = 'Email содержит две точки подряд';
 
 		setEmailError(newEmailError);
 	}
 
 	const onPasswordChange = ({ target }) => {
 		const newValue = target.value;
-		setFormData({...formData, password:newValue});
+		setFormData(prev => ({...prev, password:newValue}));
+		setErrorPassword(validatePassword( newValue ));
+
+		setLastChangedField('password');
 
 		let newPasswordError = null;
-		if (!newValue) newPasswordError = 'Пароль обязателен для заполнения';
-		else if (newValue.length < 8) newPasswordError = 'Пароль слишком короткий';
 
 		setErrorPassword(newPasswordError);
 
 		const strength = calculatePasswordStrength( newValue );
-    	setPasswordStrength(strength);
+    	setPasswordStrength({
+  			width: strength.width,
+  			class: styles[strength.classType] || '',
+			});
 	}
-
-	const calculatePasswordStrength = (password) => {
-    if (!password) return { width: 0, text: '', class: '' };
-
-    let strength = 0;
-
-    if (password.length >= 8) strength += 2;
-    else if (password.length >= 6) strength += 1;
-
-    if (/[a-z]/.test(password)) strength += 1;
-    if (/[A-Z]/.test(password)) strength += 1;
-    if (/\d/.test(password)) strength += 1;
-    if (/[^a-zA-Z\d]/.test(password)) strength += 2;
-
-    if (strength <= 2) {
-      return { width: 33, text: 'Слабый', class: styles.strengthWeak };
-    } else if (strength <= 5) {
-      return { width: 66, text: 'Средний', class: styles.strengthMedium };
-    } else {
-      return { width: 100, text: 'Сильный', class: styles.strengthStrong };
-    }
-  	};
 
 	const onRepeatPasswordChange = ({ target }) => {
 		const newValue = target.value;
 		setFormData(prev => ({...prev, repeatPassword: newValue}));
+		setErrorRepeatPassword(validateRepeatPassword(formData.password, newValue));
+		setLastChangedField('repeatPassword');
 	}
 
 	const onEmailBlur = ({ target }) => {
-		const newValue = target.value;
-
-		if (!newValue) setEmailError('Email обязателен для заполнения');
-		const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-
-		if (!emailRegex.test(target.value)) setEmailError('Введите корректный email адрес');
-	}
+  		setEmailError(validateEmailOnBlur(target.value));
+	};
 
 	const onPasswordBlur = ({ target }) => {
-		if (target.value.length < 3) setErrorPassword('Неверный пароль. Должно быть не менее 8 символов');
+  		setErrorPassword(validatePasswordOnBlur(target.value));
 	};
 
 	const onPasswordRepeatBlur = ({ target }) => {
-		const newValue = target.value;
-
-		if (newValue !== formData.password) setErrorRepeatPassword('Пароли не совпадают');
-		else setErrorRepeatPassword(null);
-  	};
+  		setErrorRepeatPassword(validatePasswordRepeatOnBlur(target.value, formData.password));
+	};
 
 	return (
 		<div className={styles.formContainer}>
